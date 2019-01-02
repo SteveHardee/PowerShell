@@ -1,0 +1,63 @@
+function Get-ADActiveUsers {
+
+
+<#
+
+.REQUIREMENTS
+
+    Windows Remote Server Administration Tools (RSAT) - PowerShell Module
+ 
+
+.DESCRIPTION
+
+    Identifies Active Directory user objects that are 'Active' within [x] days.
+    Exports Name, Last Logon, Canonical Name, When Created.
+
+
+.PARAMETER DayCount
+    
+    Specify the amount of days to 
+    Default's to 30 days
+
+    
+.PARAMETER ExportFile
+    
+    Specify the location to export the CSV file
+    Default's to c:\export.csv
+
+.EXAMPLE
+
+    PS C:\> Get-ADActiveUsers
+
+.EXAMPLE
+
+    PS C:\> Get-ADActiveUsers -DayCount 15
+    
+.EXAMPLE
+
+    PS C:\> Get-ADActiveUsers -DayCount 20 -ExportFile c:\users\johnsmith\desktop\export.csv
+                                       
+
+#>
+
+
+        [CmdletBinding()]
+    param(
+        [String]
+        $DayCount = 30,
+
+        [String]
+        $ExportFile = "c:\export.csv"
+)
+
+# get today's date
+$today = Get-Date
+
+#Get todays date and subtract the days variable, defaults to 30days.
+$cutoffdate = $today.AddDays(-$DayCount)
+
+Import-Module ActiveDirectory
+Get-ADUser -Properties *  -Filter {LastLogonDate -gt $cutoffdate}`
+| Select Name,LastLogonDate,CanonicalName,WhenCreated `
+| Export-Csv $ExportFile -Append -NoTypeInformation
+}
