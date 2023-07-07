@@ -1,4 +1,4 @@
-﻿function Test-PowerShell
+﻿function Test-PoSH
 {
 Get-LocalUser 
 }
